@@ -1,36 +1,179 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# InkPilot - AI Writing Assistant
 
-## Getting Started
+InkPilot - это интеллектуальный копилот для написания текстов, который помогает улучшить грамматику, пунктуацию и стиль, не переписывая ваш контент.
 
-First, run the development server:
+## Особенности
+
+- 🤖 **AI-анализ текста**: Проверка грамматики, пунктуации и стиля с помощью OpenAI
+- ✨ **Интерактивные подсказки**: Кликабельные выделения с рекомендациями
+- 📝 **Редактор текста**: Современный редактор с поддержкой подсветки
+- 💾 **Управление проектами**: Сохранение и управление вашими текстами
+- 🔐 **Авторизация**: Безопасный вход через Clerk
+- 📊 **Статистика**: Отслеживание количества слов и прогресса
+
+## Технологический стек
+
+- **Frontend**: Next.js 15, TypeScript, Tailwind CSS, shadcn/ui
+- **Backend**: Next.js API Routes, Prisma, PostgreSQL
+- **AI**: Vercel AI SDK, OpenAI GPT-4
+- **Auth**: Clerk
+- **Data Fetching**: SWR
+
+## Установка и настройка
+
+### 1. Клонирование проекта
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone <repository-url>
+cd ink-pilot
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 2. Установка зависимостей
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+pnpm install
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 3. Настройка базы данных
 
-## Learn More
+Создайте локальную PostgreSQL базу данных:
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+createdb inkpilot
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### 4. Настройка переменных окружения
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Создайте файл `.env.local` и добавьте следующие переменные:
 
-## Deploy on Vercel
+```env
+# Database
+DATABASE_URL="postgresql://username@localhost:5432/inkpilot"
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+# Clerk (получите ключи на https://clerk.com)
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_...
+CLERK_SECRET_KEY=sk_test_...
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+# Clerk redirects
+NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
+NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
+NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL=/dashboard
+NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL=/dashboard
+
+# OpenAI (получите ключ на https://platform.openai.com)
+OPENAI_API_KEY=sk-...
+
+# App
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+```
+
+### 5. Настройка Clerk
+
+1. Зарегистрируйтесь на [Clerk](https://clerk.com)
+2. Создайте новое приложение
+3. Скопируйте ключи в `.env.local`
+4. В настройках Clerk добавьте URL приложения: `http://localhost:3000`
+
+### 6. Миграция базы данных
+
+```bash
+pnpm prisma migrate dev
+```
+
+### 7. Запуск приложения
+
+```bash
+pnpm dev
+```
+
+Откройте [http://localhost:3000](http://localhost:3000) в браузере.
+
+## Использование
+
+### Landing Page
+- Публичная страница с описанием возможностей
+- Регистрация и вход через Clerk
+
+### Dashboard
+- Обзор всех проектов
+- Статистика написанного
+- Создание новых проектов
+
+### Editor
+- Редактирование текста
+- AI-анализ грамматики и стиля
+- Интерактивные подсказки
+- Автосохранение проектов
+
+## API Endpoints
+
+- `GET /api/projects` - Получить все проекты пользователя
+- `POST /api/projects` - Создать новый проект
+- `GET /api/projects/[id]` - Получить конкретный проект
+- `PUT /api/projects/[id]` - Обновить проект
+- `DELETE /api/projects/[id]` - Удалить проект
+- `POST /api/ai/grammar` - Проверить грамматику и пунктуацию
+- `POST /api/ai/style` - Получить рекомендации по стилю
+
+## Структура проекта
+
+```
+ink-pilot/
+├── app/                    # Next.js App Router
+│   ├── api/               # API routes
+│   ├── dashboard/         # Dashboard страница
+│   ├── editor/           # Редактор
+│   ├── layout.tsx        # Root layout
+│   └── page.tsx          # Landing page
+├── components/
+│   └── ui/               # shadcn/ui компоненты
+├── lib/
+│   ├── prisma.ts         # Prisma client
+│   └── utils.ts          # Утилиты
+├── prisma/
+│   ├── schema.prisma     # Схема базы данных
+│   └── migrations/       # Миграции
+└── middleware.ts         # Clerk middleware
+```
+
+## Разработка
+
+### Команды
+
+```bash
+# Разработка
+pnpm dev
+
+# Сборка
+pnpm build
+
+# Запуск продакшн версии
+pnpm start
+
+# Линтинг
+pnpm lint
+
+# Работа с базой данных
+pnpm prisma studio
+pnpm prisma migrate dev
+pnpm prisma generate
+```
+
+### Добавление компонентов shadcn/ui
+
+```bash
+pnpm dlx shadcn@latest add [component-name]
+```
+
+## Деплой
+
+Приложение готово для деплоя на Vercel:
+
+1. Подключите GitHub репозиторий к Vercel
+2. Добавьте переменные окружения
+3. Настройте PostgreSQL базу данных (например, Supabase или Neon)
+4. Обновите URL в настройках Clerk
+
+## Лицензия
+
+MIT License
