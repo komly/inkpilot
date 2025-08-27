@@ -53,8 +53,8 @@ interface Project {
   title: string
   content: string
   description: string | null
-  createdAt: string
-  updatedAt: string
+  createdAt: Date
+  updatedAt: Date
 }
 
 interface EditorClientProps {

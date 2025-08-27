@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { auth } from '@clerk/nextjs/server'
+import { auth, clerkClient, } from '@clerk/nextjs/server'
 import { prisma } from '@/lib/prisma'
 
 export async function GET() {
@@ -14,13 +14,17 @@ export async function GET() {
       where: { clerkId: userId }
     })
 
+    const clerk = await clerkClient()
+    const clerkUser = await clerk.users.getUser(userId)
+    const email = clerkUser.emailAddresses[0].emailAddress
+    const name = clerkUser.firstName && clerkUser.lastName ? `${clerkUser.firstName} ${clerkUser.lastName}` : null
+
     if (!user) {
-      const { emailAddresses, firstName, lastName } = await auth()
       user = await prisma.user.create({
         data: {
           clerkId: userId,
-          email: emailAddresses?.[0]?.emailAddress || '',
-          name: firstName && lastName ? `${firstName} ${lastName}` : null,
+          email: email,
+          name: name,
         }
       })
     }
@@ -55,12 +59,16 @@ export async function POST(req: NextRequest) {
     })
 
     if (!user) {
-      const { emailAddresses, firstName, lastName } = await auth()
+      const clerk = await clerkClient()
+      const clerkUser = await clerk.users.getUser(userId)
+      const email = clerkUser.emailAddresses[0].emailAddress
+      const name = clerkUser.firstName && clerkUser.lastName ? `${clerkUser.firstName} ${clerkUser.lastName}` : null
+
       user = await prisma.user.create({
         data: {
           clerkId: userId,
-          email: emailAddresses?.[0]?.emailAddress || '',
-          name: firstName && lastName ? `${firstName} ${lastName}` : null,
+          email: email,
+          name: name,
         }
       })
     }

@@ -4,8 +4,9 @@ import { prisma } from '@/lib/prisma'
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params
   try {
     const { userId } = await auth()
     if (!userId) {
@@ -22,7 +23,7 @@ export async function GET(
 
     const project = await prisma.project.findFirst({
       where: {
-        id: params.id,
+        id,
         userId: user.id
       }
     })
@@ -43,8 +44,9 @@ export async function GET(
 
 export async function PUT(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params
   try {
     const { userId } = await auth()
     if (!userId) {
@@ -63,7 +65,7 @@ export async function PUT(
 
     const project = await prisma.project.findFirst({
       where: {
-        id: params.id,
+        id,
         userId: user.id
       }
     })
@@ -73,7 +75,7 @@ export async function PUT(
     }
 
     const updatedProject = await prisma.project.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         ...(title !== undefined && { title }),
         ...(content !== undefined && { content }),
@@ -94,8 +96,9 @@ export async function PUT(
 
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params
   try {
     const { userId } = await auth()
     if (!userId) {
@@ -112,7 +115,7 @@ export async function DELETE(
 
     const project = await prisma.project.findFirst({
       where: {
-        id: params.id,
+        id,
         userId: user.id
       }
     })
@@ -122,7 +125,7 @@ export async function DELETE(
     }
 
     await prisma.project.delete({
-      where: { id: params.id }
+      where: { id }
     })
 
     return NextResponse.json({ success: true })
